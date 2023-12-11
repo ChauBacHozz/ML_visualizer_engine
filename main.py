@@ -14,6 +14,9 @@ def reset_axes(axes):
   axes.set_xlabel("X1")
   axes.set_ylabel("X2")
   axes.grid(True)
+def plot_datapoints():
+  ax.plot(data_points["X1"], data_points["X2"], marker="o", color="blue", linestyle="")
+
 def click_event(event):
   # Get click coordinates relative to the canvas
   # Add data point to the list
@@ -25,20 +28,19 @@ def print_data():
   print("Data points:")
   print(data_points)
 def linear_model():
-  global data_points
-  lr = LinearRegression().fit(data_points["X1"].values.reshape(-1, 1), data_points["X2"].values.reshape(-1, 1))
-  y = lr.predict(np.atleast_2d((-10, 10)).reshape(-1, 1))
-  reset_axes(ax)
-  ax.plot(data_points["X1"], data_points["X2"], marker="o", color="blue", linestyle="")
-  ax.plot((-10, 10), y, c = 'r')
-  canvas.draw()
-def undo(): 
-  if len(data_points) >= 0:
-    data_points.pop()
+  if len(data_points) > 1:
+    lr = LinearRegression().fit(data_points["X1"].values.reshape(-1, 1), data_points["X2"].values.reshape(-1, 1))
+    y = lr.predict(np.atleast_2d((-10, 10)).reshape(-1, 1))
     reset_axes(ax)
-    for point in data_points:
-      ax.plot(point[0], point[1], marker="o", color="blue", linestyle="")
-      canvas.draw()
+    plot_datapoints()
+    ax.plot((-10, 10), y, c = 'r')
+    canvas.draw()
+def undo(): 
+  if len(data_points) > 0:
+    data_points.drop(data_points.tail(1).index,inplace=True)
+    reset_axes(ax)
+    plot_datapoints()
+    canvas.draw()
 
 # Initialize the main window
 root = tk.Tk()
